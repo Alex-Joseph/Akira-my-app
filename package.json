@@ -8,10 +8,11 @@
     "moment-timezone": "^0.5.14",
     "react": "^16.2.0",
     "react-analog-clock": "^2.0.0",
-    "react-bootstrap": "^0.31.5",
+    "react-dates": "^16.0.1",
     "react-dom": "^16.2.0",
     "react-moment": "^0.6.8",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.0.17",
+    "reactstrap": "^5.0.0-alpha.4"
   },
   "scripts": {
     "start": "react-scripts start",

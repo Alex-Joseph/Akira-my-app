@@ -1,0 +1,26 @@
+.CalendarDay__highlighted_calendar {
+  background: yellow;
+  color: #186A3B;
+}
+
+.CalendarDay__highlighted_calendar:hover {
+  background: green;
+  color: #186A3B;
+}
+
+.CalendarDay__highlighted_calendar:active {
+  background: #004062;
+  color: #186A3B;
+}
+
+.CalendarDay__selected:active {
+  border: 1px solid #004062;
+  background: #004062;
+  color: #186A3B;
+}
+
+.CalendarDay__selected {
+  border: 1px solid #004062;
+  background: #004062;
+  color: #186A3B;
+}

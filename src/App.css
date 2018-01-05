@@ -19,6 +19,16 @@
   box-sizing: initial;
 }
 
+#datePicker {
+  display: block;
+  margin: auto;
+}
+
+.nav-links {
+  float: right;
+  margin: 2em 1em;
+}
+
 .card-body {
   background-color: #004062;
   color: white;

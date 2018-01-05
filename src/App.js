@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import logo from './akira.png';
-import { Button } from 'react-bootstrap';
+import logo from './images/akira.png';
+import Spinner from './images/Spinner.gif';
+import BookAppointmentForm from './BookAppointmentForm.js';
 import './App.css';
-import Spinner from './Spinner.gif';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import AnalogClock, { Themes } from 'react-analog-clock';
 import Moment from 'react-moment';
 import 'moment-timezone';
-import AnalogClock, { Themes } from 'react-analog-clock';
 
 Moment.globalLocale = 'en-ca';
 Moment.globalElement = 'span';
@@ -16,9 +17,17 @@ class App extends Component {
     this.state = {
       error: null,
       isLoaded: false,
-      system_status: null
+      system_status: null,
+      showBooking: false
     };
+    this.toggle = this.toggle.bind(this);
   }
+
+  toggle() {
+      this.setState({
+        showBooking: !this.state.showBooking
+      });
+    }
 
   componentDidMount() {
     const getSystemStatus = () => {
@@ -39,7 +48,7 @@ class App extends Component {
         }
       )
     }
-    setTimeout(getSystemStatus, 1000);
+    setTimeout(getSystemStatus, 500);
   }
 
   render() {
@@ -65,12 +74,22 @@ class App extends Component {
         <div className="App">
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
+            <Button className="nav-links" color="success" onClick={this.toggle}>Book an Appointment</Button>
+              <Modal isOpen={this.state.showBooking} toggle={this.toggle} className={this.props.className}>
+                <ModalHeader toggle={this.toggle}>Book An Appointment</ModalHeader>
+                <ModalBody>
+                  <BookAppointmentForm close={this.toggle}/>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                </ModalFooter>
+              </Modal>
           </header>
           <div id="main-card" className="card text-center">
             <div className="card-header">
               <h1>
                 {system_status.is_open_for_business?
-                  `We're open!` : `We are closed`}
+                  `We're Open!` : `We're Closed`}
               </h1>
             </div>
             <div className="card-body">
@@ -82,9 +101,8 @@ class App extends Component {
                 <Moment format='h a'>{hours.open_at}</Moment>
                 &nbsp; to &nbsp;
                 <Moment format='h a'>{hours.close_at}</Moment>
-
               </h5>
-               <Button bsStyle="success" bsSize='large' href="https://akira.md/download.html">
+               <Button color="success" size='lg' href="https://akira.md/download.html">
                  Get the app
                </Button>
             </div>
