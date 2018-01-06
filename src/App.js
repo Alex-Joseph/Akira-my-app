@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import logo from './images/akira.png';
 import Spinner from './images/Spinner.gif';
-import BookAppointmentForm from './BookAppointmentForm.js';
+import BookingModal from './Modal.js';
 import './App.css';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Alert, Button } from 'reactstrap';
 import AnalogClock, { Themes } from 'react-analog-clock';
 import Moment from 'react-moment';
 import 'moment-timezone';
@@ -18,16 +18,10 @@ class App extends Component {
       error: null,
       isLoaded: false,
       system_status: null,
-      showBooking: false
+      showBooking: false,
+      appAlert: null
     };
-    this.toggle = this.toggle.bind(this);
   }
-
-  toggle() {
-      this.setState({
-        showBooking: !this.state.showBooking
-      });
-    }
 
   componentDidMount() {
     const getSystemStatus = () => {
@@ -51,10 +45,36 @@ class App extends Component {
     setTimeout(getSystemStatus, 500);
   }
 
-  render() {
-    const { error, isLoaded } = this.state;
-    const system_status = this.state.system_status;
+  toggle = () => {
+    this.setState({
+      showBooking: !this.state.showBooking
+    });
+  }
 
+  Greeting = (props) => {
+    const is_open = props.isOpen;
+    if (is_open) {
+      return <h1>We're Open!</h1>
+    }
+    return <h1>We're Closed</h1>
+  }
+  handleAlert = (appAlert) => {
+    this.setState({ appAlert })
+  }
+  ShowAlert = (props) => {
+    let appAlert = props.appAlert;
+    if (appAlert) {
+      return (
+        <Alert color="success">
+          {appAlert}
+        </Alert>
+      )
+    };
+    return null
+  };
+
+  render() {
+    const { error, isLoaded, system_status } = this.state;
     if (error) {
       return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {
@@ -67,30 +87,29 @@ class App extends Component {
       )
     } else {
 
-      const hours = this.state.system_status.open_hours_today;
+      const {Greeting, ShowAlert} = this;
+      const hours = system_status.open_hours_today;
 
       return (
 
         <div className="App">
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
-            <Button className="nav-links" color="success" onClick={this.toggle}>Book an Appointment</Button>
-              <Modal isOpen={this.state.showBooking} toggle={this.toggle} className={this.props.className}>
-                <ModalHeader toggle={this.toggle}>Book An Appointment</ModalHeader>
-                <ModalBody>
-                  <BookAppointmentForm close={this.toggle}/>
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                </ModalFooter>
-              </Modal>
+            <Button className="nav-links"
+              color="success"
+              onClick={this.toggle}>
+              Book an Appointment
+            </Button>
+            <BookingModal
+              showBooking={this.state.showBooking}
+              toggle={this.toggle}
+              handleAlert={this.handleAlert}
+            />
           </header>
+          <ShowAlert appAlert={this.state.appAlert} />
           <div id="main-card" className="card text-center">
             <div className="card-header">
-              <h1>
-                {system_status.is_open_for_business?
-                  `We're Open!` : `We're Closed`}
-              </h1>
+              <Greeting isOpen={system_status.is_open_for_business} />
             </div>
             <div className="card-body">
               <div id="clock">

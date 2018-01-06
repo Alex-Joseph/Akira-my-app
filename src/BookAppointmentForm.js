@@ -8,17 +8,23 @@ import 'moment-timezone';
 
 Moment.globalLocale = 'en-ca';
 Moment.globalElement = 'span';
-
-const blocked = []
-blocked.push(moment().add(3, "days").format("MMMM Do YYYY"))
-blocked.push(moment().add(7, "days").format("MMMM Do YYYY"))
-blocked.push(moment().add(9, "days").format("MMMM Do YYYY"))
-
+// Mock data
 const doctorAvailability = {
-  "Dr. Pamala An": ['8am', '9am', '10am', '11am', '12pm'],
-  "Dr. Ingrid Lam": ['1pm', '2pm', '3pm', '4pm', '5pm'],
-  "Dr. Smeeta Khoosal": ['6pm', '7pm', '8pm', '9pm', '10pm']
-}
+  "Dr. Pamala An": {
+    "workingDays": ["Monday", "Tuesday", "Wednesday", "Thursday"],
+    "timeSlots": ['8am', '9am', '10am', '11am', '12pm']
+  },
+  "Dr. Ingrid Lam": {
+    "workingDays": ["Thursday", "Friday", "Saturday", "Sunday"],
+    "timeSlots": ['1pm', '2pm', '3pm', '4pm', '5pm']
+  },
+  "Dr. Smeeta Khoosal": {
+    "workingDays": ["Thursday", "Friday", "Saturday", "Sunday"],
+    "timeSlots": ['6pm', '7pm', '8pm', '9pm', '10pm']
+  }
+};
+
+const today = moment().format('MMMM Do YYYY');
 
 class BookAppointmentForm extends Component {
   constructor(props) {
@@ -29,88 +35,91 @@ class BookAppointmentForm extends Component {
       focused: true,
       timeSlot: null
     };
-  }
-  // listItem = (props) => {
-  //   return <li>{props.value}</li>
-  // }
-  // GetTimeSlots = (props) => {
-  //   const doc = this.props.doc
-  //   if (doc) {
-  //     return (
-  //       <ul>
-  //         {doctorAvailability[doc].map( (t,i) =>
-  //           <listItem key={i} value={t} />
-  //         )}
-  //       </ul>
-  //     )
-  //   }
-  // }
-  handleChangeDate = (event) => {
-    this.setState({date: event.target.value});
-  }
-  handleChangeDoctor = (event) => {
-    this.setState({doctor: event.target.value});
-  }
-  handleChangeTimeSlot = (event) => {
-    this.setState({timeSlot: event.target.value});
-  }
-  handleSubmit = (event) => {
-    alert(`fetch call to server (POST) for ${this.state.doctor} on
-      ${moment(this.state.date).format("MMMM Do YYYY")} at ${this.state.timeSlot}`)
-    event.preventDefault();
-    this.props.close();
-  }
+  };
+
+  handleChange = (key, value) => {
+    this.setState({
+      [key]: value
+    });
+  };
   isDayBlocked = (d) => {
+    d = moment(d._d).format("dddd");
+    let doc = this.state.doctor;
+    let workingDays = doctorAvailability[doc].workingDays;
+    if (workingDays.find(x => x === d)) {
+      return false;
+    }
+    return true;
+  };
+  highlightToday = (d) => {
     d = moment(d._d).format("MMMM Do YYYY")
-    if (blocked.find(x => x === d)) { return true }
+    if (d === today) {
+      return true;
+    }
     return false;
-  }
+  };
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let { date, doctor, timeSlot } = this.state;
+    date = moment(date).format("MMMM Do YYYY")
+    const appAlert = `Your Appointment with ${doctor} on ${date} at
+    ${timeSlot} has been recieved`
+    this.props.handleAlert(appAlert);
+    this.props.close();
+  };
 
   render() {
-    const doctors = ["Dr. Pamala An", "Dr. Ingrid Lam", "Dr. Smeeta Khoosal"]
+
     return (
       <Form onSubmit={this.handleSubmit}>
-        <FormGroup>
-          <Label for="exampleDate">Date of Appointment</Label>
-          <div id="datePicker">
-            <SingleDatePicker
-              date={this.state.date}
-              onDateChange={date => {
-                this.setState({ date })
-              }}
-              numberOfMonths={1}
-              hideKeyboardShortcutsPanel={true}
-              focused={this.state.focused}
-              isDayBlocked={this.isDayBlocked}
-              onFocusChange={({ focused }) => this.setState({ focused })}
-              required/>
-          </div>
-        </FormGroup>
         <FormGroup>
           <Label for="exampleSelect">Select Your Medical Professional</Label>
           <Input type="select"
             name="select"
             id="selectDoctor"
-            onChange={this.handleChangeDoctor} required>
+            onChange={(e) => this.handleChange("doctor", e.target.value)} required>
             <option></option>
-            {doctors.map((d, i) =>
-              <option key={i}>{d}</option>
-            )}
+              {Object.keys(doctorAvailability).map((d, i) =>
+                <option key={i}>{d}</option>
+              )}
           </Input>
+          <FormText color="danger">
+            *Required
+          </FormText>
         </FormGroup>
         {this.state.doctor ?
-        <FormGroup>
-          <Label for="exampleSelect">Select Your Time Slot</Label>
-          <Input type="select"
-            name="select"
-            id="selectTime"
-            onChange={this.handleChangeTimeSlot} required>
-            <option></option>
-            {doctorAvailability[this.state.doctor].map( (t,i) =>
-              <option key={i}>{t}</option>
-            )}
-          </Input>
-        </FormGroup>
+        <div>
+          <FormGroup>
+            <Label for="exampleDate">Date of Appointment</Label>
+            <div id="datePicker">
+              <SingleDatePicker
+                date={this.state.date}
+                onDateChange={date => {
+                  this.setState({ date })
+                }}
+                numberOfMonths={1}
+                hideKeyboardShortcutsPanel={true}
+                focused={this.state.focused}
+                isDayBlocked={this.isDayBlocked}
+                isDayHighlighted={this.highlightToday}
+                onFocusChange={({ focused }) => this.setState({ focused })}
+              required/>
+            </div>
+          </FormGroup>
+          <FormGroup>
+            <Label for="exampleSelect">Select Your Time Slot</Label>
+            <Input type="select"
+              name="select"
+              id="selectTime"
+              onChange={(e) => this.handleChange("timeSlot", e.target.value)}
+            required>
+              <option></option>
+              {doctorAvailability[this.state.doctor].timeSlots.map( (t,i) =>
+                <option key={i}>{t}</option>
+              )}
+            </Input>
+          </FormGroup>
+        </div>
         : null
         }
         <FormGroup>
