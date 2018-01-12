@@ -3,7 +3,7 @@ import logo from './images/akira.png';
 import Spinner from './images/Spinner.gif';
 import BookingModal from './Modal.js';
 import './App.css';
-import { Alert, Button } from 'reactstrap';
+import { Alert, Button, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import AnalogClock, { Themes } from 'react-analog-clock';
 import Moment from 'react-moment';
 import 'moment-timezone';
@@ -19,6 +19,7 @@ class App extends Component {
       isLoaded: false,
       system_status: null,
       showBooking: false,
+      showAbout: false,
       appAlert: null
     };
   }
@@ -45,10 +46,15 @@ class App extends Component {
     setTimeout(getSystemStatus, 500);
   }
 
-  toggle = () => {
+  toggleBooking = () => {
     this.setState({
       showBooking: !this.state.showBooking
     });
+  }
+  toggleAbout = () => {
+    this.setState({
+      showAbout: !this.state.showAbout
+    })
   }
 
   Greeting = (props) => {
@@ -97,12 +103,12 @@ class App extends Component {
             <img src={logo} className="App-logo" alt="logo" />
             <Button className="nav-links"
               color="success"
-              onClick={this.toggle}>
+              onClick={this.toggleBooking}>
               Book an Appointment
             </Button>
             <BookingModal
               showBooking={this.state.showBooking}
-              toggle={this.toggle}
+              toggle={this.toggleBooking}
               handleAlert={this.handleAlert}
             />
           </header>
@@ -132,6 +138,16 @@ class App extends Component {
               </span>
             </div>
           </div>
+            <Button color="link" onClick={this.toggleAbout} style={{ margin: '10px' }}>About</Button>
+            <Modal isOpen={this.state.showAbout}>
+              <ModalHeader toggle={this.toggleAbout}>About this page</ModalHeader>
+              <ModalBody>
+                This page is build with React and Bootstrap. It&#39;s purpose is to retrieve data from the server and display it for clients to see. The booking form uses React-dates to disable days that the doctors are not available. Additional npm packages are reactstrap, react-analog-clock and react-moment.
+              </ModalBody>
+              <ModalFooter>
+                <Button color="secondary" onClick={this.toggleAbout}>Close</Button>
+              </ModalFooter>
+            </Modal>
         </div>
       );
     }

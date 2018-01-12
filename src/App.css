@@ -2,14 +2,13 @@
   display: block;
   margin: 20% auto 0;
 }
-
 #main-card {
   background-color: white;
   color: #004062;
-  margin: 1em;
-  height: 30%
+  margin: auto;
+  height: 30%;
+  display: block;
 }
-
 #clock > * {
   display: block;
   margin: 2em auto;
@@ -18,17 +17,14 @@
   width: 200px;
   box-sizing: initial;
 }
-
 #datePicker {
   display: block;
   margin: auto;
 }
-
 .nav-links {
   float: right;
   margin: 2em 1em;
 }
-
 .card-body {
   background-color: #004062;
   color: white;
@@ -39,23 +35,20 @@
   text-align: center;
   font-family:"aktiv-grotesk","Helvetica","Arial",sans-serif;
   font-weight: 300;
+  min-height: 100%;
 }
-
 .App-logo {
   float: left;
   height: 7em;
 }
-
 .App-header {
   height: 7em;
   padding-left: 1em;
   color: white;
 }
-
 .App-title {
   font-size: 1.5em;
 }
-
 .App-intro {
   font-size: large;
 }
